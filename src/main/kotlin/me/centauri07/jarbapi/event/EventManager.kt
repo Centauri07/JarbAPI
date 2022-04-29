@@ -6,12 +6,14 @@ import java.lang.RuntimeException
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.jvm.javaMethod
 
 /**
  * @author Centauri07
  */
+
 object EventManager: IEventManager {
 
     private val executors: MutableList<ListenerExecutor> = mutableListOf()
@@ -27,10 +29,10 @@ object EventManager: IEventManager {
 
             if (method.returnType != Unit::class.createType()) continue
 
-            if (method.javaMethod?.parameterCount != 1)
+            if (method.parameters.count() != 1)
                 throw RuntimeException("Method ${method.name} needs to only have one parameter.")
 
-            if (method.javaMethod!!.parameterTypes[0] is GenericEvent)
+            if (method.parameters.first()::class.isSubclassOf(GenericEvent::class))
                 throw RuntimeException("Method ${method.name} parameter is not an event type.")
 
             executors.add(ListenerExecutor(method.parameters[0]::class, listener, method as KFunction<Unit>))
