@@ -1,5 +1,6 @@
 package me.centauri07.jarbapi
 
+import me.centauri07.jarbapi.event.Listener
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.requests.GatewayIntent
@@ -45,6 +46,10 @@ abstract class BotApplication {
         if (this.intents == null) this.intents = mutableListOf()
 
         this.intents!!.addAll(intents)
+    }
+
+    fun registerListener(vararg listeners: Listener) {
+        jda.addEventListener(listeners)
     }
 
     fun enable() {
