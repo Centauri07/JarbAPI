@@ -1,5 +1,6 @@
 package me.centauri07.jarbapi
 
+import me.centauri07.jarbapi.event.EventManager
 import me.centauri07.jarbapi.event.Listener
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -49,14 +50,16 @@ abstract class BotApplication {
     }
 
     fun registerListener(vararg listeners: Listener) {
-        jda.addEventListener(listeners)
+        jda.addEventListener(*listeners)
     }
 
     fun enable() {
 
-        jda = JDABuilder.create(token, intents ?: mutableListOf()).build()
-
         onLoad()
+
+        jda = JDABuilder.createDefault(token).build()
+
+        jda.setEventManager(EventManager)
 
         jda.awaitReady()
 
