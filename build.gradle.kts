@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.6.21")
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.11")
+    implementation("net.dv8tion:JDA:5.0.0-alpha.12")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
