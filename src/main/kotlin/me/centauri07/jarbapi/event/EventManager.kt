@@ -3,12 +3,9 @@ package me.centauri07.jarbapi.event
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.hooks.IEventManager
 import java.lang.RuntimeException
+import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.memberFunctions
-import kotlin.reflect.jvm.javaMethod
+import kotlin.reflect.full.*
 
 /**
  * @author Centauri07
@@ -29,13 +26,15 @@ object EventManager: IEventManager {
 
             if (method.returnType != Unit::class.createType()) continue
 
-            if (method.parameters.count() != 1)
+            if (method.valueParameters.count() != 1)
                 throw RuntimeException("Method ${method.name} needs to only have one parameter.")
 
-            if (method.parameters.first()::class.isSubclassOf(GenericEvent::class))
+            val parameter = method.valueParameters.first().type.classifier as KClass<*>
+
+            if (parameter.isSuperclassOf(GenericEvent::class))
                 throw RuntimeException("Method ${method.name} parameter is not an event type.")
 
-            executors.add(ListenerExecutor(method.parameters[0]::class, listener, method as KFunction<Unit>))
+            executors.add(ListenerExecutor(parameter, listener, method as KFunction<Unit>))
 
         }
 
@@ -52,9 +51,11 @@ object EventManager: IEventManager {
 
     override fun handle(event: GenericEvent) {
         for (executor in executors) {
-            if (event::class.java != executor.type) return
 
-            executor.executor.call(executor.type.cast(event))
+            if (executor.type == event::class) {
+                executor.executor.call(executor.parent, executor.type.cast(event))
+            }
+
         }
     }
 
