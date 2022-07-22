@@ -1,17 +1,26 @@
 package me.centauri07.jarbapi
 
-import me.centauri07.jarbapi.event.EventManager
-import me.centauri07.jarbapi.event.Listener
+import com.github.stefan9110.dcm.CommandManagerAPI
+import me.centauri07.jarbapi.command.CommandExecutor
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
+import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.hooks.AnnotatedEventManager
 import net.dv8tion.jda.api.requests.GatewayIntent
+import java.io.File
 
 /**
  * @author Centauri07
  */
 abstract class BotApplication {
 
-    protected lateinit var jda: JDA
+    lateinit var jda: JDA
+    protected lateinit var commandManagerAPI: CommandManagerAPI
+
+    lateinit var mainGuild: Guild
+
+    lateinit var dataFolder: File
+    lateinit var configFolder: File
 
     abstract fun onLoad()
     abstract fun onEnable()
@@ -49,8 +58,12 @@ abstract class BotApplication {
         this.intents!!.addAll(intents)
     }
 
-    fun registerListener(vararg listeners: Listener) {
+    fun registerListener(vararg listeners: Any) {
         jda.addEventListener(*listeners)
+    }
+
+    fun registerCommand(command: CommandExecutor) {
+        commandManagerAPI.registerCommand(command.build())
     }
 
     fun enable() {
@@ -59,12 +72,17 @@ abstract class BotApplication {
 
         jda = JDABuilder.createDefault(token).build()
 
-        jda.setEventManager(EventManager)
+        commandManagerAPI = CommandManagerAPI.registerAPI(jda, "!")
+
+        jda.setEventManager(AnnotatedEventManager())
 
         jda.awaitReady()
 
         onEnable()
 
+        commandManagerAPI.setRequiredGuild(mainGuild)
+
+        commandManagerAPI.updateSlashCommands(mainGuild)
     }
 
 }
