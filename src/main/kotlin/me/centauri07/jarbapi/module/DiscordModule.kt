@@ -1,6 +1,7 @@
 package me.centauri07.jarbapi.module
 
 import me.centauri07.jarbapi.BotApplication
+import java.io.File
 import java.lang.RuntimeException
 import kotlin.reflect.KClass
 import kotlin.reflect.cast
@@ -31,6 +32,9 @@ abstract class DiscordModule(protected val botApplication: BotApplication) {
 
         inline fun <reified T: DiscordModule> get(): T? = modules[T::class]?.let { T::class.cast(it) }
     }
+
+    lateinit var dataFolder: File
+    lateinit var configFolder: File
 
     abstract fun onEnable()
     abstract fun onDisable()
