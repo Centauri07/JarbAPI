@@ -72,9 +72,9 @@ abstract class BotApplication {
 
         jda = JDABuilder.createDefault(token).build()
 
-        commandManagerAPI = CommandManagerAPI.registerAPI(jda, "!")
-
         jda.setEventManager(AnnotatedEventManager())
+
+        commandManagerAPI = CommandManagerAPI.registerAPI(jda, "!")
 
         jda.awaitReady()
 
