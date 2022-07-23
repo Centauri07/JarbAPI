@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
  */
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.VALUE_PARAMETER)
-annotation class Argument(
+annotation class Option(
     val name: String,
     val description: String,
     val type: OptionType,
