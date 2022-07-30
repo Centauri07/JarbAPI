@@ -1,9 +1,14 @@
 package me.centauri07.jarbapi.command
 
 import com.github.stefan9110.dcm.builder.CommandBuilder
+import com.github.stefan9110.dcm.command.CommandArgument
 import com.github.stefan9110.dcm.manager.executor.reply.InteractionResponse
 import me.centauri07.jarbapi.command.annotation.Command
+import me.centauri07.jarbapi.command.annotation.Option
 import kotlin.reflect.KFunction
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.valueParameters
 
 /**
  * @author Centauri07
@@ -21,13 +26,19 @@ class SubCommandExecutor(
 
         commandBuilder.setDescription(data.description)
 
-        subCommands.values.forEach {
-            commandBuilder.addSubCommand(it.build())
+        executor?.let {
+            commandBuilder.addArguments(
+                *executor!!.valueParameters.filter { it.hasAnnotation<Option>() }.map {
+                    it.findAnnotation<Option>()
+                }.map { CommandArgument(it!!.type, it.name, it.description, it.required) }.toTypedArray()
+            )
         }
 
         commandBuilder.setCommandExecutor(this)
 
-        println("parent: ${data.name} | children: ${subCommands.keys}")
+        subCommands.values.forEach {
+            commandBuilder.addSubCommand(it.build())
+        }
 
         return commandBuilder.build(subCommands.isNotEmpty())
     }

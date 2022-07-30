@@ -2,6 +2,7 @@ package me.centauri07.jarbapi
 
 import com.github.stefan9110.dcm.CommandManagerAPI
 import me.centauri07.jarbapi.command.CommandExecutor
+import me.centauri07.jarbapi.module.DiscordModule
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Guild
@@ -15,11 +16,11 @@ import java.io.File
 abstract class BotApplication {
 
     lateinit var jda: JDA
-    protected lateinit var commandManagerAPI: CommandManagerAPI
+
+    private lateinit var commandManagerAPI: CommandManagerAPI
 
     lateinit var mainGuild: Guild
 
-    lateinit var dataFolder: File
     lateinit var configFolder: File
 
     abstract fun onLoad()
@@ -64,6 +65,10 @@ abstract class BotApplication {
 
     fun registerCommand(command: CommandExecutor) {
         commandManagerAPI.registerCommand(command.build())
+    }
+
+    fun addModule(discordModule: DiscordModule) {
+        DiscordModule.add(discordModule)
     }
 
     fun enable() {

@@ -1,6 +1,7 @@
 package me.centauri07.jarb.command
 
 import com.github.stefan9110.dcm.manager.executor.reply.InteractionResponse
+import me.centauri07.jarbapi.command.CommandContext
 import me.centauri07.jarbapi.command.CommandExecutor
 import me.centauri07.jarbapi.command.annotation.Option
 import me.centauri07.jarbapi.command.annotation.Command
@@ -17,7 +18,7 @@ class TestCommand: CommandExecutor() {
 
     @Command("temp.ban", "Ban a member temporarily")
     fun tempBan(
-        member: Member,
+        commandContext: CommandContext,
         @Option("member", "member to be banned", OptionType.USER, true) who: OptionMapping
     ): InteractionResponse {
 
@@ -27,7 +28,7 @@ class TestCommand: CommandExecutor() {
 
     @Command("perm.ban", "Ban a member permanently")
     fun permBan(
-        member: Member,
+        commandContext: CommandContext,
         @Option("member", "member to be banned", OptionType.USER, true) who: OptionMapping
     ): InteractionResponse {
 
@@ -37,7 +38,7 @@ class TestCommand: CommandExecutor() {
 
     @Command("kick", "Kick a member")
     fun kick(
-        member: Member,
+        commandContext: CommandContext,
         @Option("member", "member to be kicked", OptionType.USER, true) who: OptionMapping
     ): InteractionResponse {
 
@@ -47,7 +48,7 @@ class TestCommand: CommandExecutor() {
 
     @Command("temp.mute", "Mute a member temporarily")
     fun tempMute(
-        member: Member,
+        commandContext: CommandContext,
         @Option("member", "member to be banned", OptionType.USER, true) who: OptionMapping
     ): InteractionResponse {
 
@@ -57,7 +58,7 @@ class TestCommand: CommandExecutor() {
 
     @Command("perm.mute", "Mute a member permanently")
     fun permMute(
-        member: Member,
+        commandContext: CommandContext,
         @Option("member", "member to be banned", OptionType.USER, true) who: OptionMapping
     ): InteractionResponse {
 

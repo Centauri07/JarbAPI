@@ -9,7 +9,7 @@ import kotlin.reflect.cast
 /**
  * @author Centauri07
  */
-abstract class DiscordModule(protected val botApplication: BotApplication) {
+abstract class DiscordModule(protected val botApplication: BotApplication, moduleName: String) {
 
     companion object {
         @PublishedApi internal val modules: MutableMap<KClass<*>, DiscordModule> = mutableMapOf()
@@ -33,8 +33,7 @@ abstract class DiscordModule(protected val botApplication: BotApplication) {
         inline fun <reified T: DiscordModule> get(): T? = modules[T::class]?.let { T::class.cast(it) }
     }
 
-    lateinit var dataFolder: File
-    lateinit var configFolder: File
+    val configFolder: File = File(botApplication.configFolder, moduleName)
 
     abstract fun onEnable()
     abstract fun onDisable()
