@@ -34,7 +34,11 @@ abstract class BaseExecutor(private val parentExecutor: BaseExecutor? = null) : 
             optionsMap[annotation.name] = event.getOptionsByName(annotation.name).firstOrNull()
         }
 
-        return executor!!.call(parentExecutor ?: this, member, *optionsMap.values.toTypedArray())
+        return executor!!.call(
+            parentExecutor ?: this,
+            CommandContext(event.guild!!, event.member!!, event.channel),
+            *optionsMap.values.toTypedArray()
+        )
 
     }
 
