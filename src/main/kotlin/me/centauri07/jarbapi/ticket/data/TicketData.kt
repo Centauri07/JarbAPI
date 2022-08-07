@@ -8,5 +8,5 @@ import me.centauri07.jarbapi.ticket.member.TicketMember
 data class TicketData(
     val ticketId: Long,
     val channelRef: Long,
-    val members: TicketMember
+    val members: MutableList<TicketMember>
 )
