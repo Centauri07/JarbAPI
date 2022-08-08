@@ -11,7 +11,19 @@ interface Database {
 
     fun getDataSet(name: String): DataSet<Document>?
 
-    fun <T: Any> getDataSet(name: String, clazz: Class<T>): DataSet<T>
+    fun <T: Any> getDataSet(name: String, clazz: Class<T>): DataSet<T>?
+
+    fun getOrCreateDataSet(name: String): DataSet<Document> {
+        if (!hasDataSet(name)) createDataSet(name)
+
+        return getDataSet(name)!!
+    }
+
+    fun <T: Any> getOrCreateDataSet(name: String, clazz: Class<T>): DataSet<T> {
+        if (!hasDataSet(name)) createDataSet(name)
+
+        return getDataSet(name, clazz)!!
+    }
 
     fun hasDataSet(name: String): Boolean
 
