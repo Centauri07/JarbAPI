@@ -17,6 +17,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 
+    implementation("com.google.code.gson:gson:2.9.1")
+
     implementation("net.dv8tion:JDA:5.0.0-alpha.12")
     implementation("com.github.Centauri07:DCM:0.0.2")
 
