@@ -3,4 +3,4 @@ package me.centauri07.jarbapi.ticket.exception
 /**
  * @author Centauri07
  */
-class TicketTypeAlreadyExistException(message: String): Exception(message)
+class TicketTypeNotFoundException(message: String): Exception(message)
