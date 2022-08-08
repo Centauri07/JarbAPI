@@ -12,7 +12,7 @@ import kotlin.reflect.cast
 abstract class DiscordModule(protected val botApplication: BotApplication, moduleName: String) {
 
     companion object {
-        @PublishedApi internal val modules: MutableMap<KClass<*>, DiscordModule> = mutableMapOf()
+        private val modules: MutableMap<KClass<*>, DiscordModule> = mutableMapOf()
 
         fun add(module: DiscordModule) {
             if (modules.containsKey(module::class)) {
@@ -30,12 +30,12 @@ abstract class DiscordModule(protected val botApplication: BotApplication, modul
             modules.remove(module::class)
         }
 
-        inline fun <reified T: DiscordModule> get(): T? = modules[T::class]?.let { T::class.cast(it) }
+        fun <T: DiscordModule> get(clazz: KClass<T>): T? = modules[clazz]?.let { clazz.cast(it) }
     }
 
     val configFolder: File = File(botApplication.configFolder, moduleName)
 
-    abstract fun onEnable()
-    abstract fun onDisable()
+    open fun onEnable() {}
+    open fun onDisable() {}
 
 }
