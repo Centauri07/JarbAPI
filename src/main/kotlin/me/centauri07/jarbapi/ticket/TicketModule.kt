@@ -22,9 +22,9 @@ class TicketModule(
     private val ticketsData: DataSet<TicketData>,
 ) : DiscordModule(botApplication, "ticket_system") {
 
-    private val ticketTypeRegistry: MutableMap<String, TicketType<*>> = mutableMapOf()
+    private val ticketTypeRegistry: MutableMap<String, TicketType<*, *>> = mutableMapOf()
 
-    private val ticketCache: MutableMap<UUID, Ticket> = mutableMapOf()
+    private val ticketCache: MutableMap<UUID, Ticket<*>> = mutableMapOf()
 
     override fun onEnable() {
         ticketsData.find().forEach {
@@ -32,18 +32,18 @@ class TicketModule(
         }
     }
 
-    fun getTicketRegistry(): Map<String, TicketType<*>> = mutableMapOf()
+    fun getTicketRegistry(): Map<String, TicketType<*, *>> = mutableMapOf()
 
-    fun getTicketCache(): Map<UUID, Ticket> = mutableMapOf()
+    fun getTicketCache(): Map<UUID, Ticket<*>> = mutableMapOf()
 
-    fun registerTicketType(id: String, type: TicketType<*>) {
+    fun registerTicketType(id: String, type: TicketType<*, *>) {
         if (ticketTypeRegistry.containsKey(id)) throw TicketTypeAlreadyExistException("Ticket type with id $id already exist")
         if (ticketTypeRegistry.containsValue(type)) throw TicketTypeAlreadyExistException("Ticket type with class $type already exist")
 
         ticketTypeRegistry[id] = type
     }
 
-    fun createTicket(owner: Member, type: String): Ticket {
+    fun <T: Ticket<TD>, TD: TicketData> createTicket(owner: Member, type: String): T {
 
         val channelAction = getCategory(type).createTextChannel("${type}-${owner.effectiveName}")
 
@@ -53,7 +53,15 @@ class TicketModule(
 
         channel.upsertPermissionOverride(owner).grant(Permission.VIEW_CHANNEL).queue()
 
-        val ticket = getType(type).fromData(createData(owner, type, channel.idLong, mutableListOf(TicketMember(owner.idLong, TicketMemberType.OWNER))))
+        val ticketType = getType<T, TD>(type)
+
+        val ticketData = ticketType.createData(createData(owner, type, channel.idLong, mutableListOf(TicketMember(owner.idLong, TicketMemberType.OWNER))))
+
+        val ticket = ticketType.fromData(ticketData)
+
+        ticketsData.insert(ticketData)
+
+        insertCache(ticketData)
 
         ticket.initialize()
 
@@ -64,17 +72,13 @@ class TicketModule(
     fun createData(owner: Member, type: String, channelRef: Long, members: List<TicketMember>): TicketData {
         val ticketData = TicketData(UUID.randomUUID().toString(), type, channelRef, members.toMutableList())
 
-        ticketsData.insert(ticketData)
-
-        insertCache(ticketData)
-
         return ticketData
     }
 
     fun removeData(uuid: UUID) = ticketsData.delete(uuid.toString())
 
-    fun insertCache(ticketData: TicketData): Ticket {
-        val type = getType(ticketData.type)
+    fun <T: Ticket<TD>, TD: TicketData> insertCache(ticketData: TD): T {
+        val type = getType<T, TD>(ticketData.type)
 
         val ticket = type.fromData(ticketData)
 
@@ -83,7 +87,7 @@ class TicketModule(
         return ticket
     }
 
-    fun <T: Ticket> getCache(uuid: UUID, clazz: Class<T>): T? {
+    fun <T: Ticket<TD>, TD: TicketData> getCache(uuid: UUID, clazz: Class<T>): T? {
         if (!hasCache(uuid)) return null
 
         return clazz.cast(ticketCache[uuid])
@@ -91,11 +95,12 @@ class TicketModule(
 
     fun hasCache(uuid: UUID): Boolean = ticketCache.containsKey(uuid)
 
-    fun getType(name: String): TicketType<*> = ticketTypeRegistry[name] ?: throw TicketTypeNotFoundException("Ticket type with name $name not found!")
+    fun <T: Ticket<TD>, TD: TicketData> getType(name: String): TicketType<T, TD> {
+        return ticketTypeRegistry[name] as? TicketType<T, TD>
+            ?: throw TicketTypeNotFoundException("Ticket type with name $name not found!")
+    }
 
     private fun getCategory(ticketType: String): Category {
-
-        getType(ticketType)
 
         val categories = moduleData.categories.filter { it.value == ticketType }.keys.mapNotNull {
             botApplication.mainGuild.getCategoryById(it)

@@ -1,5 +1,6 @@
 package me.centauri07.jarbapi.ticket
 
+import me.centauri07.jarbapi.ticket.data.TicketData
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.MessageBuilder
 import net.dv8tion.jda.api.entities.GuildMessageChannel
@@ -9,9 +10,11 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 /**
  * @author Centauri07
  */
-interface Ticket {
+interface Ticket<T: TicketData> {
 
-    fun getChannel(): GuildMessageChannel
+    val data: T
+
+    val channel: GuildMessageChannel
 
     fun sendMessage(message: Message)
 
