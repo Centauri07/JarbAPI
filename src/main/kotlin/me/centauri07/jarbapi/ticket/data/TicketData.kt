@@ -13,10 +13,4 @@ data class TicketData<T>(
     var channelRef: Long,
     val members: MutableList<TicketMember>,
     val ticketTypeData: T
-) {
-
-    fun getOwner(): TicketMember? = members.firstOrNull { it.userType == TicketMemberType.OWNER }
-
-    fun isOwner(id: Long): Boolean = members.firstOrNull { it.memberId == id }?.userType?.equals(TicketMemberType.OWNER) ?: false
-
-}
+)

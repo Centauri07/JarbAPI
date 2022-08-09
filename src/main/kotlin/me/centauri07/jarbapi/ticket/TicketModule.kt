@@ -41,25 +41,29 @@ class TicketModule(
         ticketTypeRegistry[id] = type
     }
 
-    fun <T: Ticket<TD>, TD> createTicket(owner: Member, ticketData: TicketData<TD>): T {
+    fun <T: Ticket<TD>, TD> createTicket(owner: Member, type: String, ticketData: TD): T {
 
-        val channelAction = getCategory(ticketData.type).createTextChannel("${ticketData.type}-${owner.effectiveName}")
+        val ticketId = UUID.randomUUID().toString()
 
-        channelAction.setTopic(ticketData.ticketId)
+        val channelAction = getCategory(type).createTextChannel("${type}-${owner.effectiveName}")
+
+        channelAction.setTopic(ticketId)
 
         channelAction.syncPermissionOverrides()
 
         val channel = channelAction.complete()
 
+        val data = TicketData(UUID.randomUUID().toString(), type, channel.idLong, mutableListOf(), ticketData)
+
         channel.upsertPermissionOverride(owner).grant(Permission.VIEW_CHANNEL).queue()
 
-        val ticketType = getType<T, TD>(ticketData.type)
+        val ticketType = getType(data.type) as TicketType<T, TD>
 
-        val ticket = ticketType.fromData(ticketData)
+        val ticket = ticketType.fromData(data)
 
-        ticketsData.insert(ticketData)
+        ticketsData.insert(data)
 
-        insertCache(ticketData)
+        insertCache(data)
 
         ticket.initialize()
 
@@ -69,14 +73,12 @@ class TicketModule(
 
     fun removeData(uuid: UUID) = ticketsData.delete(uuid.toString())
 
-    fun <T: Ticket<TD>, TD> insertCache(ticketData: TicketData<TD>): T {
-        val type = getType<T, TD>(ticketData.type)
+    fun <TD> insertCache(ticketData: TicketData<TD>) {
+        val type = getType(ticketData.type) as TicketType<*, TD>
 
         val ticket = type.fromData(ticketData)
 
         ticketCache[UUID.fromString(ticketData.ticketId)] = ticket
-
-        return ticket
     }
 
     fun <T: Ticket<TD>, TD> getCache(uuid: UUID, clazz: Class<T>): T? {
@@ -87,10 +89,7 @@ class TicketModule(
 
     fun hasCache(uuid: UUID): Boolean = ticketCache.containsKey(uuid)
 
-    fun <T: Ticket<TD>, TD> getType(name: String): TicketType<T, TD> {
-        return ticketTypeRegistry[name] as? TicketType<T, TD>
-            ?: throw TicketTypeNotFoundException("Ticket type with name $name not found!")
-    }
+    fun getType(name: String): TicketType<*, *> = ticketTypeRegistry[name] ?: throw TicketTypeNotFoundException("Ticket type with name $name not found!")
 
     private fun getCategory(ticketType: String): Category {
 
