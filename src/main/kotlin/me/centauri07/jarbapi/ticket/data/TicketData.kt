@@ -7,11 +7,12 @@ import org.bson.codecs.pojo.annotations.BsonId
 /**
  * @author Centauri07
  */
-open class TicketData(
+data class TicketData<T>(
     @BsonId val ticketId: String,
     val type: String,
     var channelRef: Long,
-    val members: MutableList<TicketMember>
+    val members: MutableList<TicketMember>,
+    val ticketTypeData: T
 ) {
 
     fun getOwner(): TicketMember? = members.firstOrNull { it.userType == TicketMemberType.OWNER }

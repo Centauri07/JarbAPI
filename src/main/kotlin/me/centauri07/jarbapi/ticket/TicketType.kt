@@ -5,10 +5,8 @@ import me.centauri07.jarbapi.ticket.data.TicketData
 /**
  * @author Centauri07
  */
-interface TicketType<T: Ticket<TD>, TD: TicketData> {
+interface TicketType<T: Ticket<TD>, TD> {
 
-    fun fromData(data: TD): T
-
-    fun createData(data: TicketData): TD
+    fun fromData(data: TicketData<TD>): T
 
 }

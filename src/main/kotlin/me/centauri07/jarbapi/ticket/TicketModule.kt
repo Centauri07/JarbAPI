@@ -6,8 +6,6 @@ import me.centauri07.jarbapi.module.DiscordModule
 import me.centauri07.jarbapi.ticket.data.TicketData
 import me.centauri07.jarbapi.ticket.exception.TicketTypeAlreadyExistException
 import me.centauri07.jarbapi.ticket.exception.TicketTypeNotFoundException
-import me.centauri07.jarbapi.ticket.member.TicketMember
-import me.centauri07.jarbapi.ticket.member.TicketMemberType
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Category
 import net.dv8tion.jda.api.entities.Member
@@ -19,7 +17,7 @@ import java.util.*
 class TicketModule(
     botApplication: BotApplication,
     private val moduleData: TicketModuleData,
-    private val ticketsData: DataSet<TicketData>,
+    private val ticketsData: DataSet<TicketData<*>>,
 ) : DiscordModule(botApplication, "ticket_system") {
 
     private val ticketTypeRegistry: MutableMap<String, TicketType<*, *>> = mutableMapOf()
@@ -43,9 +41,11 @@ class TicketModule(
         ticketTypeRegistry[id] = type
     }
 
-    fun <T: Ticket<TD>, TD: TicketData> createTicket(owner: Member, type: String): T {
+    fun <T: Ticket<TD>, TD> createTicket(owner: Member, ticketData: TicketData<TD>): T {
 
-        val channelAction = getCategory(type).createTextChannel("${type}-${owner.effectiveName}")
+        val channelAction = getCategory(ticketData.type).createTextChannel("${ticketData.type}-${owner.effectiveName}")
+
+        channelAction.setTopic(ticketData.ticketId)
 
         channelAction.syncPermissionOverrides()
 
@@ -53,9 +53,7 @@ class TicketModule(
 
         channel.upsertPermissionOverride(owner).grant(Permission.VIEW_CHANNEL).queue()
 
-        val ticketType = getType<T, TD>(type)
-
-        val ticketData = ticketType.createData(createData(owner, type, channel.idLong, mutableListOf(TicketMember(owner.idLong, TicketMemberType.OWNER))))
+        val ticketType = getType<T, TD>(ticketData.type)
 
         val ticket = ticketType.fromData(ticketData)
 
@@ -69,15 +67,9 @@ class TicketModule(
 
     }
 
-    fun createData(owner: Member, type: String, channelRef: Long, members: List<TicketMember>): TicketData {
-        val ticketData = TicketData(UUID.randomUUID().toString(), type, channelRef, members.toMutableList())
-
-        return ticketData
-    }
-
     fun removeData(uuid: UUID) = ticketsData.delete(uuid.toString())
 
-    fun <T: Ticket<TD>, TD: TicketData> insertCache(ticketData: TD): T {
+    fun <T: Ticket<TD>, TD> insertCache(ticketData: TicketData<TD>): T {
         val type = getType<T, TD>(ticketData.type)
 
         val ticket = type.fromData(ticketData)
@@ -87,7 +79,7 @@ class TicketModule(
         return ticket
     }
 
-    fun <T: Ticket<TD>, TD: TicketData> getCache(uuid: UUID, clazz: Class<T>): T? {
+    fun <T: Ticket<TD>, TD> getCache(uuid: UUID, clazz: Class<T>): T? {
         if (!hasCache(uuid)) return null
 
         return clazz.cast(ticketCache[uuid])
@@ -95,7 +87,7 @@ class TicketModule(
 
     fun hasCache(uuid: UUID): Boolean = ticketCache.containsKey(uuid)
 
-    fun <T: Ticket<TD>, TD: TicketData> getType(name: String): TicketType<T, TD> {
+    fun <T: Ticket<TD>, TD> getType(name: String): TicketType<T, TD> {
         return ticketTypeRegistry[name] as? TicketType<T, TD>
             ?: throw TicketTypeNotFoundException("Ticket type with name $name not found!")
     }

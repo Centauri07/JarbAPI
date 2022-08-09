@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.entities.MessageEmbed
 /**
  * @author Centauri07
  */
-interface Ticket<T: TicketData> {
+interface Ticket<T> {
 
-    val data: T
+    val data: TicketData<T>
 
     val channel: GuildMessageChannel
 
