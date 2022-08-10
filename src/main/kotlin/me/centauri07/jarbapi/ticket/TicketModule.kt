@@ -1,7 +1,6 @@
 package me.centauri07.jarbapi.ticket
 
 import me.centauri07.jarbapi.BotApplication
-import me.centauri07.jarbapi.database.DataSet
 import me.centauri07.jarbapi.module.DiscordModule
 import me.centauri07.jarbapi.ticket.data.TicketData
 import me.centauri07.jarbapi.ticket.exception.TicketTypeAlreadyExistException
@@ -17,48 +16,39 @@ import java.util.*
 class TicketModule(
     botApplication: BotApplication,
     private val moduleData: TicketModuleData,
-    private val ticketsData: DataSet<TicketData<*>>,
 ) : DiscordModule(botApplication, "ticket_system") {
 
     private val ticketTypeRegistry: MutableMap<String, TicketType<*, *>> = mutableMapOf()
 
-    private val ticketCache: MutableMap<UUID, Ticket<*>> = mutableMapOf()
+    fun getTicketRegistry(): Map<String, TicketType<*, *>> = ticketTypeRegistry
 
-    override fun onEnable() {
-        ticketsData.find().forEach {
-            insertCache(it)
-        }
+    fun registerTicketType(ticketType: TicketType<*, *>) {
+        if (ticketTypeRegistry.containsKey(ticketType.id)) throw TicketTypeAlreadyExistException("Ticket type with id ${ticketType.id} already exist")
+        if (ticketTypeRegistry.containsValue(ticketType)) throw TicketTypeAlreadyExistException("Ticket type with class $ticketType already exist")
+
+        ticketTypeRegistry[ticketType.id] = ticketType
     }
 
-    fun getTicketRegistry(): Map<String, TicketType<*, *>> = mutableMapOf()
-
-    fun getTicketCache(): Map<UUID, Ticket<*>> = mutableMapOf()
-
-    fun registerTicketType(type: TicketType<*, *>) {
-        if (ticketTypeRegistry.containsKey(type.id)) throw TicketTypeAlreadyExistException("Ticket type with id ${type.id} already exist")
-        if (ticketTypeRegistry.containsValue(type)) throw TicketTypeAlreadyExistException("Ticket type with class $type already exist")
-
-        ticketTypeRegistry[type.id] = type
-    }
-
-    fun <T: Ticket<TD>, TD> createTicket(owner: Member, type: String, ticketData: TD): T {
+    fun <T: Ticket<TD>, TD> createTicket(owner: Member, ticketTypeId: String, data: TD): T {
 
         val ticketId = UUID.randomUUID().toString()
 
-        val channel = getCategory(type).createTextChannel("${type}-${owner.effectiveName}")
+        val channel = getCategory(ticketTypeId).createTextChannel("${ticketTypeId}-${owner.effectiveName}")
             .setTopic(ticketId)
             .syncPermissionOverrides()
             .complete()
 
-        val data = TicketData(ticketId, type, channel.idLong, mutableListOf(), ticketData)
+        val ticketData = TicketData(ticketId, ticketTypeId, channel.idLong, mutableListOf(), data)
 
         channel.upsertPermissionOverride(owner).grant(Permission.VIEW_CHANNEL).queue()
 
-        val ticket = (getType(data.type) as TicketType<T, TD>).fromData(data)
+        val ticketType = getType(ticketData.type) as TicketType<T, TD>
 
-        ticketsData.insert(data)
+        val ticket = ticketType.fromData(ticketData)
 
-        insertCache(data)
+        ticketType.insertData(ticketData)
+
+        ticketType.insertCache(ticketData)
 
         ticket.initialize()
 
@@ -66,28 +56,9 @@ class TicketModule(
 
     }
 
-    fun removeData(uuid: UUID) = ticketsData.delete(uuid.toString())
-
-    fun <TD> insertCache(ticketData: TicketData<TD>) {
-        val type = getType(ticketData.type) as TicketType<*, TD>
-
-        val ticket = type.fromData(ticketData)
-
-        ticketCache[UUID.fromString(ticketData.ticketId)] = ticket
-    }
-
-    fun <T: Ticket<TD>, TD> getCache(uuid: UUID, clazz: Class<T>): T? {
-        if (!hasCache(uuid)) return null
-
-        return clazz.cast(ticketCache[uuid])
-    }
-
-    fun hasCache(uuid: UUID): Boolean = ticketCache.containsKey(uuid)
-
-    fun getType(name: String): TicketType<*, *> = ticketTypeRegistry[name] ?: throw TicketTypeNotFoundException("Ticket type with name $name not found!")
+    fun getType(ticketTypeId: String): TicketType<*, *> = ticketTypeRegistry[ticketTypeId] ?: throw TicketTypeNotFoundException("Ticket type with name $ticketTypeId not found!")
 
     private fun getCategory(ticketType: String): Category {
-
         val categories = moduleData.categories.filter { it.value == ticketType }.keys.mapNotNull {
             botApplication.mainGuild.getCategoryById(it)
         }
@@ -100,5 +71,6 @@ class TicketModule(
             }
 
     }
+
 
 }
