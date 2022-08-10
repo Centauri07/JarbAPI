@@ -34,32 +34,27 @@ class TicketModule(
 
     fun getTicketCache(): Map<UUID, Ticket<*>> = mutableMapOf()
 
-    fun registerTicketType(id: String, type: TicketType<*, *>) {
-        if (ticketTypeRegistry.containsKey(id)) throw TicketTypeAlreadyExistException("Ticket type with id $id already exist")
+    fun registerTicketType(type: TicketType<*, *>) {
+        if (ticketTypeRegistry.containsKey(type.id)) throw TicketTypeAlreadyExistException("Ticket type with id ${type.id} already exist")
         if (ticketTypeRegistry.containsValue(type)) throw TicketTypeAlreadyExistException("Ticket type with class $type already exist")
 
-        ticketTypeRegistry[id] = type
+        ticketTypeRegistry[type.id] = type
     }
 
     fun <T: Ticket<TD>, TD> createTicket(owner: Member, type: String, ticketData: TD): T {
 
         val ticketId = UUID.randomUUID().toString()
 
-        val channelAction = getCategory(type).createTextChannel("${type}-${owner.effectiveName}")
+        val channel = getCategory(type).createTextChannel("${type}-${owner.effectiveName}")
+            .setTopic(ticketId)
+            .syncPermissionOverrides()
+            .complete()
 
-        channelAction.setTopic(ticketId)
-
-        channelAction.syncPermissionOverrides()
-
-        val channel = channelAction.complete()
-
-        val data = TicketData(UUID.randomUUID().toString(), type, channel.idLong, mutableListOf(), ticketData)
+        val data = TicketData(ticketId, type, channel.idLong, mutableListOf(), ticketData)
 
         channel.upsertPermissionOverride(owner).grant(Permission.VIEW_CHANNEL).queue()
 
-        val ticketType = getType(data.type) as TicketType<T, TD>
-
-        val ticket = ticketType.fromData(data)
+        val ticket = (getType(data.type) as TicketType<T, TD>).fromData(data)
 
         ticketsData.insert(data)
 
