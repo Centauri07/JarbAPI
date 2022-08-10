@@ -7,6 +7,8 @@ import me.centauri07.jarbapi.ticket.data.TicketData
  */
 interface TicketType<T: Ticket<TD>, TD> {
 
+    val id: String
+
     fun fromData(data: TicketData<TD>): T
 
 }
