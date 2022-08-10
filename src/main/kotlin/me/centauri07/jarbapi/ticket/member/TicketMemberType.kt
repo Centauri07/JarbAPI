@@ -5,6 +5,6 @@ package me.centauri07.jarbapi.ticket.member
  */
 enum class TicketMemberType {
 
-    OWNER, USER, ROLE
+    USER, ROLE
 
 }
