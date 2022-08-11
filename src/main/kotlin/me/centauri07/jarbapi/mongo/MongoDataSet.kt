@@ -6,6 +6,7 @@ import me.centauri07.jarbapi.database.DataSet
 import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.findOneById
 import org.litote.kmongo.updateOneById
+import org.litote.kmongo.util.idValue
 
 /**
  * @author Centauri07
@@ -27,9 +28,7 @@ class MongoDataSet<T>(private val collection: MongoCollection<T>): DataSet<T> {
         collection.deleteOneById(id)
     }
 
-    override fun delete(filter: (T) -> Boolean) {
-        // TODO
-    }
+    override fun delete(filter: (T) -> Boolean) = find(filter).forEach { it.idValue?.let { id -> delete(id) } }
 
     override fun edit(id: Any, replacement: T) {
         collection.updateOneById(id, replacement!!)
