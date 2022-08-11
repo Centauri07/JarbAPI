@@ -30,7 +30,7 @@ interface Ticket<T> {
     fun addMember(memberId: Long, ticketMemberType: TicketMemberType)
     fun removeMember(memberId: Long)
 
-    fun initialize()
+    fun initialize(owner: Member)
 
     fun close()
 
