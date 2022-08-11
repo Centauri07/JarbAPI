@@ -32,8 +32,8 @@ interface Ticket<T> {
 
     fun initialize(owner: Member)
 
-    fun close()
+    fun close(executor: Member, reason: String)
 
-    fun delete()
+    fun delete(executor: Member, reason: String)
 
 }
