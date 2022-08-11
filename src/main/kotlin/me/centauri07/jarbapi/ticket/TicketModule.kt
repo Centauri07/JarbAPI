@@ -50,7 +50,7 @@ class TicketModule(
 
         ticketType.insertCache(ticketData)
 
-        ticket.initialize()
+        ticket.initialize(owner)
 
         return ticket
 
