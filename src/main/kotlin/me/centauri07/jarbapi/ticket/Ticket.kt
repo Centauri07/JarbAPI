@@ -16,8 +16,6 @@ interface Ticket<T> {
 
     val data: TicketData<T>
 
-    val channel: GuildMessageChannel
-
     fun sendMessage(message: Message)
 
     fun sendMessage(message: MessageBuilder.() -> Unit) =
