@@ -5,6 +5,7 @@ import com.github.stefan9110.dcm.command.CommandArgument
 import com.github.stefan9110.dcm.manager.executor.reply.InteractionResponse
 import me.centauri07.jarbapi.command.annotation.Command
 import me.centauri07.jarbapi.command.annotation.Option
+import net.dv8tion.jda.api.interactions.commands.OptionType
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
@@ -30,7 +31,12 @@ class SubCommandExecutor(
             commandBuilder.addArguments(
                 *executor!!.valueParameters.filter { it.hasAnnotation<Option>() }.map {
                     it.findAnnotation<Option>()
-                }.map { CommandArgument(it!!.type, it.name, it.description, it.required) }.toTypedArray()
+                }.map { CommandArgument(it!!.type, it.name, it.description, it.required, when (it.type) {
+                    OptionType.STRING -> it.stringAutocomplete.toList()
+                    OptionType.INTEGER -> it.integerAutocomplete.toList()
+                    OptionType.NUMBER -> it.doubleAutocomplete.toList()
+                    else -> null
+                }) }.toTypedArray()
             )
         }
 
