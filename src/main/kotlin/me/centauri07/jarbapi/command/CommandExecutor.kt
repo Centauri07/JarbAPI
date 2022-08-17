@@ -1,12 +1,11 @@
 package me.centauri07.jarbapi.command
 
-import com.github.stefan9110.dcm.builder.CommandBuilder
-import com.github.stefan9110.dcm.command.CommandArgument
-import com.github.stefan9110.dcm.manager.executor.reply.InteractionResponse
+import me.centauri07.dc.api.command.builder.CommandBuilder
+import me.centauri07.dc.api.command.option.CommandOption
+import me.centauri07.dc.api.response.Response
 import me.centauri07.jarbapi.command.annotation.Command
 import me.centauri07.jarbapi.command.annotation.Executor
 import me.centauri07.jarbapi.command.annotation.Option
-import net.dv8tion.jda.api.interactions.commands.OptionType
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
@@ -18,30 +17,28 @@ import kotlin.reflect.full.valueParameters
  */
 open class CommandExecutor : BaseExecutor() {
     override val commandAnnotation: Command by lazy { this::class.findAnnotation()!! }
-    override var executor: KFunction<InteractionResponse>? = null
+    override var executor: KFunction<Response>? = null
     override val data: BaseExecutorData by lazy { BaseExecutorData(commandAnnotation.name.split("\\.").first(), commandAnnotation.description) }
 
-    private val subCommandFunctions: MutableMap<String, KFunction<InteractionResponse>> = mutableMapOf()
+    private val subCommandFunctions: MutableMap<String, KFunction<Response>> = mutableMapOf()
 
     init {
 
         val functions = this::class.memberFunctions
 
-        executor = functions.firstOrNull { it.hasAnnotation<Executor>() } as KFunction<InteractionResponse>?
+        executor = functions.firstOrNull { it.hasAnnotation<Executor>() } as KFunction<Response>?
 
         functions.filter { it.hasAnnotation<Command>() }.forEach {
-            subCommandFunctions[it.findAnnotation<Command>()!!.name] = it as KFunction<InteractionResponse>
+            subCommandFunctions[it.findAnnotation<Command>()!!.name] = it as KFunction<Response>
         }
 
         if (subCommandFunctions.isEmpty() && executor == null) throw NullPointerException("Cannot find function annotated with Executor")
 
     }
 
-    override fun build(): com.github.stefan9110.dcm.command.Command {
+    override fun build(type: Class<*>): me.centauri07.dc.api.command.Command {
 
-        val commandBuilder = CommandBuilder.create(data.name)
-
-        commandBuilder.setDescription(data.description)
+        val commandBuilder = CommandBuilder(data.name, data.description, type)
 
         for (entry in subCommandFunctions.entries) {
             val keys = entry.key.split(".")
@@ -77,29 +74,19 @@ open class CommandExecutor : BaseExecutor() {
         }
 
         subCommands.values.forEach {
-            commandBuilder.addSubCommand(
-                it.build()
+            commandBuilder.addSubCommands(
+                it.build(type)
             )
         }
 
-        executor?.let {
-            commandBuilder.addArguments(
-                *executor!!.valueParameters.filter { it.hasAnnotation<Option>() }.map {
-                    it.findAnnotation<Option>()
-                }.map { CommandArgument(it!!.type, it.name, it.description, it.required, when (it.type) {
-                    OptionType.STRING -> it.stringAutocomplete.toList()
-                    OptionType.INTEGER -> it.integerAutocomplete.toList()
-                    OptionType.NUMBER -> it.doubleAutocomplete.toList()
-                    else -> null
-                }) }.toTypedArray()
-            )
-        }
+        executor?.valueParameters?.filter { it.hasAnnotation<Option>() }
+            ?.map { it.findAnnotation<Option>() }
+            ?.map { CommandOption(it!!.type, it.name, it.description, it.required) }
+            ?.forEach { commandBuilder.addCommandOption(it) }
 
-        commandBuilder.setCommandExecutor(this)
+        commandBuilder.setExecutor(this)
 
-        return commandBuilder.build(true)
-
-
+        return commandBuilder.build()
     }
 
 

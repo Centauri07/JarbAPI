@@ -1,11 +1,13 @@
 package me.centauri07.jarbapi
 
-import com.github.stefan9110.dcm.CommandManagerAPI
+import me.centauri07.dc.internal.DiscordCommandAPI
 import me.centauri07.jarbapi.command.CommandExecutor
 import me.centauri07.jarbapi.module.DiscordModule
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Guild
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.hooks.AnnotatedEventManager
 import net.dv8tion.jda.api.requests.GatewayIntent
 import java.io.File
@@ -17,7 +19,7 @@ abstract class BotApplication {
 
     lateinit var jda: JDA
 
-    private lateinit var commandManagerAPI: CommandManagerAPI
+    private lateinit var discordCommandAPI: DiscordCommandAPI
 
     lateinit var mainGuild: Guild
 
@@ -63,8 +65,12 @@ abstract class BotApplication {
         jda.addEventListener(*listeners)
     }
 
-    fun registerCommand(command: CommandExecutor) {
-        commandManagerAPI.registerCommand(command.build())
+    fun registerSlashCommand(command: CommandExecutor) {
+        discordCommandAPI.registerCommand(command.build(SlashCommandInteractionEvent::class.java))
+    }
+
+    fun registerMessageCommand(command: CommandExecutor) {
+        discordCommandAPI.registerCommand(command.build(MessageReceivedEvent::class.java))
     }
 
     fun addModule(discordModule: DiscordModule) {
@@ -79,15 +85,12 @@ abstract class BotApplication {
 
         jda.setEventManager(AnnotatedEventManager())
 
-        commandManagerAPI = CommandManagerAPI.registerAPI(jda, "!")
+        discordCommandAPI = DiscordCommandAPI()
+        discordCommandAPI.initialize(jda, "!")
 
         jda.awaitReady()
 
         onEnable()
-
-        commandManagerAPI.setRequiredGuild(mainGuild)
-
-        commandManagerAPI.updateSlashCommands(mainGuild)
     }
 
 }

@@ -11,8 +11,5 @@ annotation class Option(
     val name: String,
     val description: String,
     val type: OptionType,
-    val required: Boolean,
-    val stringAutocomplete: Array<String> = [],
-    val integerAutocomplete: LongArray = [],
-    val doubleAutocomplete: DoubleArray = []
+    val required: Boolean
 )
