@@ -19,10 +19,10 @@ dependencies {
 
     implementation("com.google.code.gson:gson:2.9.1")
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.12")
+    implementation("net.dv8tion:JDA:5.0.0-alpha.17")
     implementation("com.github.Centauri07:DiscordCommand:38be19b9b7")
 
-    implementation("org.litote.kmongo:kmongo:4.6.1")
+    implementation("org.litote.kmongo:kmongo:4.7.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
