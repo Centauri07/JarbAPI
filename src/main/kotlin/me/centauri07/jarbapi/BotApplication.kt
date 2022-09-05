@@ -23,6 +23,8 @@ abstract class BotApplication {
 
     lateinit var mainGuild: Guild
 
+    val rootFolder: File = File(".")
+    lateinit var dataFolder: File
     lateinit var configFolder: File
 
     abstract fun onLoad()

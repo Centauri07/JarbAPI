@@ -14,6 +14,10 @@ import net.dv8tion.jda.api.entities.MessageEmbed
  */
 interface Ticket<T> {
 
+    val channel: GuildMessageChannel
+
+    val ticketType: TicketType<*, T>
+
     val data: TicketData<T>
 
     fun sendMessage(message: Message)
@@ -29,9 +33,7 @@ interface Ticket<T> {
     fun removeMember(memberId: Long)
 
     fun initialize(owner: Member)
-
     fun close(executor: Member, reason: String)
-
     fun delete(executor: Member, reason: String)
 
 }
