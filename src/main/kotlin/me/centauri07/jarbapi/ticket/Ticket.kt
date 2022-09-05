@@ -30,7 +30,7 @@ interface Ticket<T> {
         sendMessageEmbed(EmbedBuilder().apply { messageEmbed.invoke(this) }.build())
 
     fun addMember(memberId: Long, ticketMemberType: TicketMemberType)
-    fun removeMember(memberId: Long)
+    fun removeMember(memberId: Long, ticketMemberType: TicketMemberType)
 
     fun initialize(owner: Member)
     fun close(executor: Member, reason: String)
