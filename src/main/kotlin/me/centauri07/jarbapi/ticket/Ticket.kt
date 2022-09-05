@@ -29,7 +29,7 @@ interface Ticket<T> {
     fun sendMessageEmbed(messageEmbed: EmbedBuilder.() -> Unit) =
         sendMessageEmbed(EmbedBuilder().apply { messageEmbed.invoke(this) }.build())
 
-    fun addMember(memberId: Long, ticketMemberType: TicketMemberType)
+    fun addMember(memberId: Long, ticketMemberType: TicketMemberType, permission: List<String>)
     fun removeMember(memberId: Long, ticketMemberType: TicketMemberType)
 
     fun initialize(owner: Member)
