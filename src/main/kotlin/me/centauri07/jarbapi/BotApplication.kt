@@ -83,8 +83,8 @@ abstract class BotApplication {
 
         onLoad()
 
-        jda = JDABuilder.createDefault(token).build()
-
+        jda = JDABuilder.create(token, intents ?: emptyList()).build()
+        
         jda.setEventManager(AnnotatedEventManager())
 
         discordCommandAPI = DiscordCommandAPI()
