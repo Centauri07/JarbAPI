@@ -20,6 +20,15 @@ interface Ticket<T> {
 
     val data: TicketData<T>
 
+    fun initialize(owner: Member)
+    fun close(executor: Member, reason: String)
+    fun delete(executor: Member, reason: String)
+
+    fun addMember(memberId: Long, ticketMemberType: TicketMemberType, permission: List<String>)
+    fun removeMember(memberId: Long, ticketMemberType: TicketMemberType)
+    
+    fun hasPermission(id: Long, ticketMemberType: TicketMemberType, permission: String)
+
     fun sendMessage(message: Message)
 
     fun sendMessage(message: MessageBuilder.() -> Unit) =
@@ -28,12 +37,5 @@ interface Ticket<T> {
     fun sendMessageEmbed(messageEmbed: MessageEmbed) = sendMessage { setEmbeds(messageEmbed) }
     fun sendMessageEmbed(messageEmbed: EmbedBuilder.() -> Unit) =
         sendMessageEmbed(EmbedBuilder().apply { messageEmbed.invoke(this) }.build())
-
-    fun addMember(memberId: Long, ticketMemberType: TicketMemberType, permission: List<String>)
-    fun removeMember(memberId: Long, ticketMemberType: TicketMemberType)
-
-    fun initialize(owner: Member)
-    fun close(executor: Member, reason: String)
-    fun delete(executor: Member, reason: String)
 
 }
