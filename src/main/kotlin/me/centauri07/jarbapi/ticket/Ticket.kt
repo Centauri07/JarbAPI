@@ -26,8 +26,11 @@ interface Ticket<T> {
 
     fun addMember(memberId: Long, ticketMemberType: TicketMemberType, permission: List<String>)
     fun removeMember(memberId: Long, ticketMemberType: TicketMemberType)
-    
-    fun hasPermission(id: Long, ticketMemberType: TicketMemberType, permission: String)
+    fun isMember(memberId: Long, ticketMemberType: TicketMemberType): Boolean
+
+    fun hasPermission(id: Long, ticketMemberType: TicketMemberType, permission: String): Boolean
+    fun grant(memberId: Long, ticketMemberType: TicketMemberType, permission: String)
+    fun disallow(memberId: Long, ticketMemberType: TicketMemberType, permission: String)
 
     fun sendMessage(message: Message)
 
