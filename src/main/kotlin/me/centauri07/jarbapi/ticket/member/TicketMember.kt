@@ -6,5 +6,5 @@ package me.centauri07.jarbapi.ticket.member
 data class TicketMember(
     val memberId: Long,
     val memberType: TicketMemberType,
-    val permissions: List<String>
+    val permissions: MutableList<String>
 )
