@@ -24,7 +24,6 @@ class TicketModule(
 
     fun registerTicketType(ticketType: TicketType<*, *>) {
         if (ticketTypeRegistry.containsKey(ticketType.id)) throw TicketTypeAlreadyExistException("Ticket type with id ${ticketType.id} already exist")
-        if (ticketTypeRegistry.containsValue(ticketType)) throw TicketTypeAlreadyExistException("Ticket type with class $ticketType already exist")
 
         ticketTypeRegistry[ticketType.id] = ticketType
     }
