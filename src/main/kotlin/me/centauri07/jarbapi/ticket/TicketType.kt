@@ -21,7 +21,7 @@ abstract class TicketType<T: Ticket<TD>, TD>(
     abstract fun fromData(ticketData: TicketData<TD>): T
 
     fun insertData(ticketData: TicketData<TD>) = ticketsData.insert(ticketData)
-    fun deleteData(uuid: UUID) = ticketsData.delete(uuid)
+    fun deleteData(uuid: UUID) = ticketsData.delete(uuid.toString())
     fun updateData(uuid: UUID) = ticketsCache[uuid]?.let { ticketsData.edit(uuid.toString(), it.data) }
     fun hasData(uuid: UUID): Boolean = ticketsData.find(uuid.toString()) != null
 
