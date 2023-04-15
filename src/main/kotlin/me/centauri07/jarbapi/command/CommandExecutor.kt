@@ -17,7 +17,7 @@ import kotlin.reflect.full.valueParameters
  */
 open class CommandExecutor : BaseExecutor() {
     override val commandAnnotation: Command by lazy { this::class.findAnnotation()!! }
-    override var executor: KFunction<Response>? = null
+    final override var executor: KFunction<Response>? = null
     override val data: BaseExecutorData by lazy { BaseExecutorData(commandAnnotation.name.split("\\.").first(), commandAnnotation.description) }
 
     private val subCommandFunctions: MutableMap<String, KFunction<Response>> = mutableMapOf()

@@ -6,8 +6,8 @@ import me.centauri07.jarbapi.ticket.data.TicketData
 import me.centauri07.jarbapi.ticket.exception.TicketTypeAlreadyExistException
 import me.centauri07.jarbapi.ticket.exception.TicketTypeNotFoundException
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.Category
 import net.dv8tion.jda.api.entities.Member
+import net.dv8tion.jda.api.entities.channel.concrete.Category
 import java.util.*
 
 /**

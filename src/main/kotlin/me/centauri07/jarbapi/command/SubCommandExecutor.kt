@@ -5,7 +5,6 @@ import me.centauri07.dc.api.command.option.CommandOption
 import me.centauri07.dc.api.response.Response
 import me.centauri07.jarbapi.command.annotation.Command
 import me.centauri07.jarbapi.command.annotation.Option
-import net.dv8tion.jda.api.interactions.commands.OptionType
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation

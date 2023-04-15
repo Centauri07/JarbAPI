@@ -7,7 +7,7 @@ import me.centauri07.dc.api.response.Response
 import me.centauri07.jarbapi.command.annotation.Option
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.MessageChannel
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.Event
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent

@@ -8,6 +8,8 @@ import java.io.FileWriter
 
 /**
  * @author Centauri07
+ *
+ * This class converts data between POJO and JSON File
  */
 class JsonAdapter<T>(var clazz: Class<T>, var defaultValue: T?, name: String, parent: File) {
 

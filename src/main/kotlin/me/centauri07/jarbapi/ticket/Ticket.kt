@@ -2,19 +2,17 @@ package me.centauri07.jarbapi.ticket
 
 import me.centauri07.jarbapi.ticket.data.TicketData
 import me.centauri07.jarbapi.ticket.member.TicketMemberType
-import net.dv8tion.jda.api.EmbedBuilder
-import net.dv8tion.jda.api.MessageBuilder
-import net.dv8tion.jda.api.entities.GuildMessageChannel
 import net.dv8tion.jda.api.entities.Member
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder
+import net.dv8tion.jda.api.utils.messages.MessageCreateData
 
 /**
  * @author Centauri07
  */
 interface Ticket<T> {
 
-    val channel: GuildMessageChannel
+    val channel: MessageChannel
 
     val ticketType: TicketType<*, T>
 
@@ -32,13 +30,9 @@ interface Ticket<T> {
     fun grant(memberId: Long, ticketMemberType: TicketMemberType, permission: String)
     fun disallow(memberId: Long, ticketMemberType: TicketMemberType, permission: String)
 
-    fun sendMessage(message: Message)
+    fun sendMessage(message: MessageCreateData)
 
-    fun sendMessage(message: MessageBuilder.() -> Unit) =
-        sendMessage(MessageBuilder().apply { message.invoke(this) }.build())
-
-    fun sendMessageEmbed(messageEmbed: MessageEmbed) = sendMessage { setEmbeds(messageEmbed) }
-    fun sendMessageEmbed(messageEmbed: EmbedBuilder.() -> Unit) =
-        sendMessageEmbed(EmbedBuilder().apply { messageEmbed.invoke(this) }.build())
+    fun sendMessage(message: MessageCreateBuilder.() -> Unit) =
+        sendMessage(MessageCreateBuilder().apply { message.invoke(this) }.build())
 
 }
