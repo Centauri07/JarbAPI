@@ -17,15 +17,15 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.21")
 
-    implementation("com.google.code.gson:gson:2.9.1")
+    implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("net.dv8tion:JDA:5.0.0-beta.8")
     implementation("com.github.andeng07:DiscordCommand:38be19b9b7")
 
-    implementation("org.litote.kmongo:kmongo:4.7.0")
+    implementation("org.litote.kmongo:kmongo:4.8.0")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.2")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.2")
 }
 
 tasks.getByName<Test>("test") {
