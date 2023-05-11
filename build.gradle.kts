@@ -20,7 +20,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
 
     implementation("net.dv8tion:JDA:5.0.0-beta.8")
-    implementation("com.github.andeng07:DiscordCommand:38be19b9b7")
+    implementation("com.github.andeng07:DiscordCommand:87ad87df0c")
 
     implementation("org.litote.kmongo:kmongo:4.8.0")
 
