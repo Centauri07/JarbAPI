@@ -6,6 +6,7 @@ import me.centauri07.jarbapi.ticket.data.TicketData
 import me.centauri07.jarbapi.ticket.exception.TicketTypeAlreadyExistException
 import me.centauri07.jarbapi.ticket.exception.TicketTypeNotFoundException
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Member
 import net.dv8tion.jda.api.entities.channel.concrete.Category
 import java.util.*
@@ -32,12 +33,12 @@ class TicketModule(
 
         val ticketId = UUID.randomUUID().toString()
 
-        val channel = getCategory(ticketTypeId).createTextChannel("${ticketTypeId}-${owner.effectiveName}")
+        val channel = getCategory(owner.guild, ticketTypeId).createTextChannel("${ticketTypeId}-${owner.effectiveName}")
             .setTopic(ticketId)
             .syncPermissionOverrides()
             .complete()
 
-        val ticketData = TicketData(ticketId, ticketTypeId, channel.idLong, mutableListOf(), data)
+        val ticketData = TicketData(ticketId, ticketTypeId, owner.guild.idLong, channel.idLong, mutableListOf(), data)
 
         channel.upsertPermissionOverride(owner).grant(Permission.VIEW_CHANNEL).queue()
 
@@ -57,16 +58,17 @@ class TicketModule(
 
     fun getType(ticketTypeId: String): TicketType<*, *> = ticketTypeRegistry[ticketTypeId] ?: throw TicketTypeNotFoundException("Ticket type with name $ticketTypeId not found!")
 
-    private fun getCategory(ticketType: String): Category {
-        val categories = moduleData.categories.filter { it.value == ticketType }.keys.mapNotNull {
-            botApplication.mainGuild.getCategoryById(it)
-        }
+    private fun getCategory(guild: Guild, ticketType: String): Category {
+        val categories = moduleData.categories.filter { it.key == guild.idLong }.values.first()
+            .categories.filter { it.value == ticketType }.keys.mapNotNull {
+                guild.getCategoryById(it)
+            }
 
-        return categories.firstOrNull { it.channels.size < 50 } ?: botApplication.mainGuild
+        return categories.firstOrNull { it.channels.size < 50 } ?: guild
             .createCategory(ticketType + if (categories.isNotEmpty()) categories.count() + 1 else "")
             .complete().also {
-                it.upsertPermissionOverride(botApplication.mainGuild.publicRole).deny(Permission.VIEW_CHANNEL).queue()
-                moduleData.categories[it.idLong] = ticketType
+                it.upsertPermissionOverride(guild.publicRole).deny(Permission.VIEW_CHANNEL).queue()
+                moduleData.categories[guild.idLong]!!.categories[it.idLong] = ticketType
             }
 
     }
