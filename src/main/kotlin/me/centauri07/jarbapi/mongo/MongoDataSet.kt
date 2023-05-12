@@ -1,7 +1,6 @@
 package me.centauri07.jarbapi.mongo
 
 import com.mongodb.client.MongoCollection
-import com.mongodb.client.model.Filters
 import me.centauri07.jarbapi.database.DataSet
 import org.litote.kmongo.deleteOneById
 import org.litote.kmongo.findOneById
@@ -32,5 +31,11 @@ class MongoDataSet<T>(private val collection: MongoCollection<T>): DataSet<T> {
 
     override fun edit(id: Any, replacement: T) {
         collection.updateOneById(id, replacement!!)
+    }
+
+    override fun edit(filter: (T) -> Boolean, replacement: T) {
+        val toEdit = find(filter).first()
+
+        toEdit.idValue?.let { edit(it, replacement) }
     }
 }

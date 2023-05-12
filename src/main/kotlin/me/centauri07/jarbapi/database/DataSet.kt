@@ -19,4 +19,6 @@ interface DataSet<T> {
 
     fun edit(id: Any, replacement: T)
 
+    fun edit(filter: (T) -> Boolean, replacement: T)
+
 }
