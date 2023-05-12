@@ -59,16 +59,19 @@ class TicketModule(
     fun getType(ticketTypeId: String): TicketType<*, *> = ticketTypeRegistry[ticketTypeId] ?: throw TicketTypeNotFoundException("Ticket type with name $ticketTypeId not found!")
 
     private fun getCategory(guild: Guild, ticketType: String): Category {
-        val categories = moduleData.categories.filter { it.key == guild.idLong }.values.first()
-            .categories.filter { it.value == ticketType }.keys.mapNotNull {
-                guild.getCategoryById(it)
-            }
+        val ticketCategoryList = moduleData.categories[guild.idLong] ?: TicketCategoryList(mutableMapOf()).also {
+            moduleData.categories[guild.idLong] = it
+        }
+
+        val categories = ticketCategoryList.categories.filter { it.value == ticketType }.keys.mapNotNull {
+            guild.getCategoryById(it)
+        }
 
         return categories.firstOrNull { it.channels.size < 50 } ?: guild
             .createCategory(ticketType + if (categories.isNotEmpty()) categories.count() + 1 else "")
             .complete().also {
                 it.upsertPermissionOverride(guild.publicRole).deny(Permission.VIEW_CHANNEL).queue()
-                moduleData.categories[guild.idLong]!!.categories[it.idLong] = ticketType
+                ticketCategoryList.categories[it.idLong] = ticketType
             }
 
     }
