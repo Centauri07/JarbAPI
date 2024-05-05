@@ -2,6 +2,7 @@ package me.centauri07.jarbapi
 
 import me.centauri07.dc.internal.DiscordCommandAPI
 import me.centauri07.jarbapi.command.CommandExecutor
+import me.centauri07.jarbapi.component.ButtonCallback
 import me.centauri07.jarbapi.module.DiscordModule
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -93,6 +94,8 @@ abstract class BotApplication {
         jda.awaitReady()
 
         onEnable()
+
+        registerListener(ButtonCallback)
     }
 
 }
