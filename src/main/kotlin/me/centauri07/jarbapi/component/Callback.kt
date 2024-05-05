@@ -6,9 +6,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button
 
 interface Callback<C, E> {
 
-    val queue: MutableMap<C, (E) -> Unit>
-        get() = mutableMapOf()
-
     fun queue(component: C, eventAction: (E) -> Unit)
 
     fun dequeue(component: C, event: E)
@@ -17,6 +14,9 @@ interface Callback<C, E> {
 
 
 object ButtonCallback: Callback<String, ButtonInteractionEvent> {
+
+    private val queue: MutableMap<String, (ButtonInteractionEvent) -> Unit> = mutableMapOf()
+
     override fun queue(component: String, eventAction: (ButtonInteractionEvent) -> Unit) {
         queue[component] = eventAction
     }
