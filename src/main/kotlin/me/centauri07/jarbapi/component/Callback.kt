@@ -2,6 +2,7 @@ package me.centauri07.jarbapi.component
 
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.hooks.SubscribeEvent
+import net.dv8tion.jda.api.interactions.components.buttons.Button
 
 interface Callback<C, E> {
 
@@ -32,4 +33,8 @@ object ButtonCallback: Callback<String, ButtonInteractionEvent> {
     fun on(e: ButtonInteractionEvent) {
         e.button.id?.let { dequeue(it, e) }
     }
+}
+
+fun Button.callback(eventAction: (ButtonInteractionEvent) -> Unit) {
+    ButtonCallback.queue(id!!, eventAction)
 }
