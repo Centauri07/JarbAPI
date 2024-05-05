@@ -35,6 +35,8 @@ object ButtonCallback: Callback<String, ButtonInteractionEvent> {
     }
 }
 
-fun Button.callback(eventAction: (ButtonInteractionEvent) -> Unit) {
+fun Button.callback(eventAction: (ButtonInteractionEvent) -> Unit): Button {
     ButtonCallback.queue(id!!, eventAction)
+
+    return this
 }
