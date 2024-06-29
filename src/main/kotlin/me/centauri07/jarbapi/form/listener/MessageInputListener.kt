@@ -14,7 +14,7 @@ class MessageInputListener(private val formModule: FormModule): ListenerAdapter(
 
         if (form.channel.idLong != e.channel.idLong) return
 
-        try { e.message.delete() } catch (_: Exception) { }
+        try { e.message.delete().queue() } catch (_: Exception) { }
 
         if (e.message.contentRaw == Form.cancelCommand) {
             form.cancel()
