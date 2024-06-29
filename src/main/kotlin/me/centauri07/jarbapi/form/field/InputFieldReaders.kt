@@ -34,7 +34,8 @@ object DoubleReader : InputReader<Double>(Double::class.java) {
 
 object BooleanReader : InputReader<Boolean>(Boolean::class.java) {
     override fun read(input: String): Result<Boolean> =
-        input.toBooleanStrictOrNull()?.let { Result.success(it) } ?: Result.failure(InputFormatException("Invalid format."))
+        input.lowercase().toBooleanStrictOrNull()?.let { Result.success(it) }
+            ?: Result.failure(InputFormatException("Invalid format."))
 }
 
 object CharReader : InputReader<Char>(Char::class.java) {
