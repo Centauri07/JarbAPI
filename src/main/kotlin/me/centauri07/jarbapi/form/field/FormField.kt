@@ -1,5 +1,7 @@
 package me.centauri07.jarbapi.form.field
 
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
+
 abstract class FormField<T>(
     val name: String,
     val description: String,
@@ -10,6 +12,8 @@ abstract class FormField<T>(
 
     abstract var value: T?
         protected set
+
+    open var messageModifier: (MessageCreateAction) -> Unit = { }
 
     open var inquiryPrompt: String = "Enter $name"
         protected set

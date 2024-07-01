@@ -75,9 +75,10 @@ class Form(
         }
 
         if (nextField.required) {
-            channel.sendMessage(inquiryMessage(nextField)).queue()
+            channel.sendMessage(inquiryMessage(nextField)).also { nextField.messageModifier(it) }.queue()
         } else {
             channel.sendMessage(selectFieldMessage(nextField))
+                .also { nextField.messageModifier(it) }
                 .setActionRow(
                     listOf(
                         Button.success("y-${nextField.id}", "Yes").callback {
