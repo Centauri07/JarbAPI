@@ -1,25 +1,19 @@
 package me.centauri07.jarbapi.form.field
 
-import me.centauri07.jarbapi.form.InputFormatException
 import me.centauri07.jarbapi.form.InputValidationException
+import me.centauri07.jarbapi.form.InvalidInputTypeException
 import me.centauri07.jarbapi.form.UnknownInputReader
 
 class InputField<T>(tClass: Class<T>, name: String, description: String, required: Boolean = true) :
     FormField<T>(name, description, required) {
-
-    //companion object {
-    //   var inquiryMessage: String = "Enter %name%"
-    //}
 
     private var reader: InputReader<T> =
         InputReaderRegistry.get(tClass) ?: throw UnknownInputReader(tClass)
 
     override var value: T? = null
 
-    // override var inquiryMessage: String = Companion.inquiryMessage.replace("%name%", name)
-
     override fun set(value: Any): Result<FormField<T>> {
-        if (value !is String) return Result.failure(InputFormatException("Value must be a string."))
+        if (value !is String) return Result.failure(InvalidInputTypeException())
 
         val readValue = reader.read(value).getOrElse { return Result.failure(it) }
 
