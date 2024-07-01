@@ -50,7 +50,7 @@ class Form(
 
     var idle: Boolean = false
 
-    private fun next(): FormField<*> =
+    fun next(): FormField<*> =
         fields.next() ?: throw NoFieldFoundException()
 
     fun process(valueFromMessage: Any? = null) {
