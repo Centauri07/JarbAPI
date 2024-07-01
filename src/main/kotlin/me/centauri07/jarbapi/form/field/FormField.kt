@@ -11,10 +11,10 @@ abstract class FormField<T>(
     abstract var value: T?
         protected set
 
-    open var inquiryMessage: String = "Enter $name"
+    open var inquiryPrompt: String = "Enter $name"
         protected set
 
-    open var selectMessage: String = "Would you like to enter $name?"
+    open var selectFieldPrompt: String = "Would you like to enter $name?"
         protected set
 
     var acknowledged: Boolean = false

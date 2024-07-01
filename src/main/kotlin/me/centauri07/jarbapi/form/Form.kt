@@ -22,15 +22,15 @@ class Form(
     companion object {
         var cancelCommand = "f!cancel"
 
-        var selectMessage: (field: FormField<*>) -> MessageCreateData =
+        var selectFieldMessage: (field: FormField<*>) -> MessageCreateData =
             {
-                MessageCreateData.fromEmbeds(EmbedBuilder().setAuthor(it.name).setDescription(it.selectMessage).build())
+                MessageCreateData.fromEmbeds(EmbedBuilder().setAuthor(it.name).setDescription(it.selectFieldPrompt).build())
             }
 
         var inquiryMessage: (field: FormField<*>) -> MessageCreateData =
             {
                 MessageCreateData.fromEmbeds(
-                    EmbedBuilder().setTitle(it.name).setAuthor(it.description).setDescription(it.inquiryMessage).build()
+                    EmbedBuilder().setTitle(it.name).setAuthor(it.description).setDescription(it.inquiryPrompt).build()
                 )
             }
         var failMessage: (field: FormField<*>, failureMessage: String) -> MessageCreateData =
@@ -77,7 +77,7 @@ class Form(
         if (nextField.required) {
             channel.sendMessage(inquiryMessage(nextField)).queue()
         } else {
-            channel.sendMessage(selectMessage(nextField))
+            channel.sendMessage(selectFieldMessage(nextField))
                 .setActionRow(
                     listOf(
                         Button.success("y-${nextField.id}", "Yes").callback {
