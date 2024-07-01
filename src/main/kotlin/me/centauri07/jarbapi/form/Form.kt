@@ -7,7 +7,6 @@ import me.centauri07.jarbapi.module.DiscordModule
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.entities.User
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
-import net.dv8tion.jda.api.interactions.components.ActionRow
 import net.dv8tion.jda.api.interactions.components.buttons.Button
 import net.dv8tion.jda.api.utils.messages.MessageCreateData
 
@@ -82,14 +81,14 @@ class Form(
                 .setActionRow(
                     listOf(
                         Button.success("y-${nextField.id}", "Yes").callback {
+                            it.deferReply(true).queue()
                             nextField.required = true
                             process()
-                            it.deferReply(true).queue()
                         },
                         Button.danger("n-${nextField.id}", "No").callback {
+                            it.deferReply().queue()
                             nextField.acknowledged = true
                             process()
-                            it.deferReply().queue()
                         }
                     )
                 ).queue()
