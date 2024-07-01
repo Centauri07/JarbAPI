@@ -82,14 +82,20 @@ class Form(
                 .setActionRow(
                     listOf(
                         Button.success("y-${nextField.id}", "Yes").callback {
-                            it.deferReply(true).queue()
-                            nextField.required = true
-                            process()
+
+                            it.editComponents(it.message.actionRows.map { actionRow -> actionRow.asDisabled() }).queue {
+                                nextField.required = true
+                                process()
+                            }
+
                         },
                         Button.danger("n-${nextField.id}", "No").callback {
-                            it.deferReply().queue()
-                            nextField.acknowledged = true
-                            process()
+
+                            it.editComponents(it.message.actionRows.map { actionRow -> actionRow.asDisabled() }).queue {
+                                nextField.acknowledged = true
+                                process()
+                            }
+
                         }
                     )
                 ).queue()
