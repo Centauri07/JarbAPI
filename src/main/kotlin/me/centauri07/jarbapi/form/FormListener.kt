@@ -1,6 +1,7 @@
 package me.centauri07.jarbapi.form
 
 import me.centauri07.jarbapi.form.field.ButtonChoiceField
+import me.centauri07.jarbapi.form.field.InputField
 import me.centauri07.jarbapi.module.DiscordModule
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
@@ -28,6 +29,8 @@ object FormListener : ListenerAdapter() {
             return
         }
 
+        if (form.currentField !is InputField) return
+
         form.process(e.message.contentRaw)
     }
 
@@ -37,7 +40,7 @@ object FormListener : ListenerAdapter() {
 
         if (form.channel.idLong != e.channel.idLong) return
 
-        if (form.next() !is ButtonChoiceField) return
+        if (form.currentField !is ButtonChoiceField) return
 
         e.editComponents(e.message.actionRows.map { it.asDisabled() }).queue {
             form.process(e.button.id!!)

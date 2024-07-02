@@ -12,9 +12,6 @@ open class ChoiceFormField<T>(name: String, description: String, required: Boole
     override var inquiryPrompt: String = "Choose from the following options"
 
     override fun set(value: Any): Result<FormField<*>> {
-        choices.forEach { println(it) }
-        println(value)
-
         try {
             value as T
         } catch (e: ClassCastException) {

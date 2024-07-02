@@ -50,22 +50,24 @@ class Form(
 
     var idle: Boolean = false
 
-    fun next(): FormField<*> =
+    var currentField: FormField<*> = next()
+
+    private fun next(): FormField<*> =
         fields.next() ?: throw NoFieldFoundException()
 
     fun process(valueFromMessage: Any? = null) {
         if (idle) return
 
-        var nextField = next()
+        currentField = next()
 
         if (valueFromMessage != null) {
-            val exception = nextField.set(valueFromMessage).exceptionOrNull()
+            val exception = currentField.set(valueFromMessage).exceptionOrNull()
 
             if (exception != null && exception !is InvalidInputTypeException) {
-                channel.sendMessage(failMessage(nextField, exception.message!!)).queue()
+                channel.sendMessage(failMessage(currentField, exception.message!!)).queue()
                 return
             } else if (exception == null) {
-                nextField = try {
+                currentField = try {
                     next()
                 } catch (_: NoFieldFoundException) {
                     complete()
@@ -74,25 +76,25 @@ class Form(
             }
         }
 
-        if (nextField.required) {
-            channel.sendMessage(inquiryMessage(nextField)).also { nextField.messageModifier(it) }.queue()
+        if (currentField.required) {
+            channel.sendMessage(inquiryMessage(currentField)).also { currentField.messageModifier(it) }.queue()
         } else {
-            channel.sendMessage(selectFieldMessage(nextField))
-                .also { nextField.messageModifier(it) }
+            channel.sendMessage(selectFieldMessage(currentField))
+                .also { currentField.messageModifier(it) }
                 .setActionRow(
                     listOf(
-                        Button.success("y-${nextField.id}", "Yes").callback {
+                        Button.success("y-${currentField.id}", "Yes").callback {
 
                             it.editComponents(it.message.actionRows.map { actionRow -> actionRow.asDisabled() }).queue {
-                                nextField.required = true
+                                currentField.required = true
                                 process()
                             }
 
                         },
-                        Button.danger("n-${nextField.id}", "No").callback {
+                        Button.danger("n-${currentField.id}", "No").callback {
 
                             it.editComponents(it.message.actionRows.map { actionRow -> actionRow.asDisabled() }).queue {
-                                nextField.acknowledged = true
+                                currentField.acknowledged = true
                                 process()
                             }
 
